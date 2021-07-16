@@ -1,3 +1,7 @@
+stop0 <- function(...) {
+  stop(..., call. = FALSE)
+}
+
 dtproj_path <- function(...) {
   system.file(..., package = "dtproj")
 }
