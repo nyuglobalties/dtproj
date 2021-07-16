@@ -6,7 +6,10 @@
 \alias{dtproj-package}
 \title{dtproj: Create Data Team Projects In A Flash!}
 \description{
-What the package does (one paragraph).
+Sets up data projects based on a checklist,
+    heavily drawing on the templating features from usethis
+    and whisker. Primarily for internal purposes, but could
+    be useful more broadly.
 }
 \author{
 \strong{Maintainer}: Patrick Anker \email{psanker@nyu.edu} (\href{https://orcid.org/0000-0003-2302-0445}{ORCID})
