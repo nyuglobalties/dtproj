@@ -19,6 +19,7 @@ init <- function(path = ".", force = FALSE) {
   renv <- FALSE
   auth_osf <- FALSE
   auth_kobo <- FALSE
+  unit_tests <- FALSE
 
   usethis::with_project(path, {
     usethis::use_directory("R")
@@ -27,7 +28,12 @@ init <- function(path = ".", force = FALSE) {
     auth_osf <- dtprj_use_osf()
     auth_kobo <- dtprj_use_kobo()
 
-    engine <- dtprj_use_engine(auth_kobo = auth_kobo)
+    unit_tests <- dtprj_use_tests()
+
+    engine <- dtprj_use_engine(
+      unit_tests = unit_tests,
+      auth_kobo = auth_kobo
+    )
     renv <- dtprj_use_renv()
 
   })
