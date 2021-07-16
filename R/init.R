@@ -1,3 +1,14 @@
+#' Create a Data Team Pipeline project
+#' 
+#' Sets up the necessary infrastructure to get a pipeline spun up
+#' real quick!
+#' 
+#' @param path Where the project should be created. Defaults to 
+#'   the current working directory.
+#' @param force If content already exists in `path`, removes it for
+#'   creation of project architecture. **Be careful!!** Use only 
+#'   when absolutely needed.
+#' @return The path of the project, invisibly
 #' @export
 init <- function(path = ".", force = FALSE) {
   if (!interactive()) {
@@ -22,8 +33,15 @@ init <- function(path = ".", force = FALSE) {
   unit_tests <- FALSE
 
   usethis::with_project(path, {
+    usethis::use_git_ignore(".RData")
     usethis::use_directory("R")
     usethis::use_directory("config")
+    
+    use_templ(
+      "common",
+      "utils.R",
+      save_as = "R/utils.R"
+    )
 
     auth_osf <- dtprj_use_osf()
     auth_kobo <- dtprj_use_kobo()
@@ -38,11 +56,17 @@ init <- function(path = ".", force = FALSE) {
 
   })
 
+  info_messages(
+    unit_tests = unit_tests
+  )
+
   todo_messages(
     auth_osf = auth_osf,
     auth_kobo = auth_kobo,
     renv = renv
   )
+
+  invisible(path)
 }
 
 check_path_existing <- function(path) {
@@ -74,16 +98,16 @@ check_path_existing <- function(path) {
 post_messages <- function(type, ...) {
   known_messages <- list(
     auth_osf = c(
-        "Set the 'OSF_PAT' environment variable in your .Renviron to your OSF token. ",
-        "See details here: https://docs.ropensci.org/osfr/articles/auth"
+      "Set the 'OSF_PAT' environment variable in your .Renviron to your OSF token. ",
+      "See details here: https://docs.ropensci.org/osfr/articles/auth"
     ),
     auth_kobo = c(
-        "Set the 'KPI_TOKEN' environment variable in your .Renviron to your KPI token. ",
-        "See details here: https://support.kobotoolbox.org/api.html#getting-your-api-token"
+      "Set the 'KPI_TOKEN' environment variable in your .Renviron to your KPI token. ",
+      "See details here: https://support.kobotoolbox.org/api.html#getting-your-api-token"
     ),
     renv = "Run `renv::init()`",
     unit_tests = "See the testthat docs to learn how to create your own tests"
-    )
+  )
 
   args <- list(...)
   struct <- lapply(names(args), function(nx) {
@@ -94,7 +118,7 @@ post_messages <- function(type, ...) {
     list(
       value = args[[nx]],
       msg = known_messages[[nx]]
-  )
+    )
   })
 
   for (el in struct) {
@@ -114,7 +138,7 @@ info_messages <- function(
     "info",
     unit_tests = unit_tests
   )
-  }
+}
 
 todo_messages <- function(
   auth_osf = FALSE,
