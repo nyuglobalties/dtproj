@@ -4,6 +4,9 @@
 # dtproj
 
 <!-- badges: start -->
+
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
 > Sets up data projects based on a checklist, heavily drawing on the
