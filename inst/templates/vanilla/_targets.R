@@ -29,6 +29,15 @@ if (is.null(karpi::kpi_auth_token())) {
 }
 {{/auth_kobo}}
 
+{{#unit_tests}}
+# Run tests if configured
+if (isTRUE(F_RUN_TESTS)) {
+  library(testthat)
+  
+  run_unit_tests()
+}
+{{/unit_tests}}
+
 # Add tar_targets() to this list to define the pipeline
 list(
   tar_blueprints()
