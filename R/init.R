@@ -71,35 +71,60 @@ check_path_existing <- function(path) {
   invisible(TRUE)
 }
 
+post_messages <- function(type, ...) {
+  known_messages <- list(
+    auth_osf = c(
+        "Set the 'OSF_PAT' environment variable in your .Renviron to your OSF token. ",
+        "See details here: https://docs.ropensci.org/osfr/articles/auth"
+    ),
+    auth_kobo = c(
+        "Set the 'KPI_TOKEN' environment variable in your .Renviron to your KPI token. ",
+        "See details here: https://support.kobotoolbox.org/api.html#getting-your-api-token"
+    ),
+    renv = "Run `renv::init()`",
+    unit_tests = "See the testthat docs to learn how to create your own tests"
+    )
+
+  args <- list(...)
+  struct <- lapply(names(args), function(nx) {
+    if (!nx %in% names(known_messages)) {
+      stop0("Message ID not found in `known_messages`: '", nx, "'")
+    }
+
+    list(
+      value = args[[nx]],
+      msg = known_messages[[nx]]
+  )
+  })
+
+  for (el in struct) {
+    if (isTRUE(el$value)) {
+      switch(type,
+        todo = usethis::ui_todo(el$msg),
+        info = usethis::ui_info(el$msg)
+      )
+    }
+  }
+}
+
+info_messages <- function(
+  unit_tests = FALSE
+) {
+  post_messages(
+    "info",
+    unit_tests = unit_tests
+  )
+  }
+
 todo_messages <- function(
   auth_osf = FALSE,
   auth_kobo = FALSE,
   renv = FALSE
 ) {
-  struct <- list(
-    osf = list(
-      value = auth_osf,
-      todo = c(
-        "Set the 'OSF_PAT' environment variable in your .Renviron to your OSF token. ",
-        "See details here: https://docs.ropensci.org/osfr/articles/auth"
-      )
-    ),
-    kobo = list(
-      value = auth_kobo,
-      todo = c(
-        "Set the 'KPI_TOKEN' environment variable in your .Renviron to your KPI token. ",
-        "See details here: https://support.kobotoolbox.org/api.html#getting-your-api-token"
-      )
-    ),
-    renv = list(
-      value = renv,
-      todo = "Run `renv::init()`"
-    )
+  post_messages(
+    "todo",
+    auth_osf = auth_osf,
+    auth_kobo = auth_kobo,
+    renv = renv
   )
-
-  for (el in struct) {
-    if (isTRUE(el$value)) {
-      usethis::ui_todo(el$todo)
-    }
-  }
 }
