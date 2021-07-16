@@ -15,8 +15,7 @@ dtprj_use_kobo <- function(path = usethis::proj_get()) {
       save_as = "R/kobo.R"
     )
 
-    dt_git_ignore("_kobocache", path = path)
-
+    usethis::use_git_ignore("_kobocache")
     usethis::ui_done("Adding KPI auth statement to workflow script")
   }
 
@@ -41,8 +40,7 @@ dtprj_use_osf <- function(path = usethis::proj_get()) {
       usethis::ui_info("osfutils already installed")
     }
 
-    dt_git_ignore("_osfcache", path = path)
-
+    usethis::use_git_ignore("_osfcache")
     usethis::ui_done("Adding OSF auth statement to workflow script")
   }
 
