@@ -1,0 +1,35 @@
+name: Mark a task complete
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+    steps:
+      - name: Set PR number
+        run: echo "::set-env name=PR_NUMBER::$(echo -n "${GITHUB_REF}" | awk 'BEGIN { FS = "/" } ; { print $3 }')"
+      - uses: panther-labs/github-asana-action@v3.0.4
+        if: github.event.pull_request.merged
+        with:
+          asana-pat: ${{ secrets.ASANA_PAT }}
+          trigger-phrase-regex: '\/asana'
+          action: 'remove-comment'
+          comment-id: "#pr:${{ env.PR_NUMBER }}"
+      - uses: panther-labs/github-asana-action@v3.0.4
+        if: github.event.pull_request.merged
+        with:
+          asana-pat: ${{ secrets.ASANA_PAT }}
+          trigger-phrase-regex: '\/asana'
+          action: 'add-comment'
+          text: 'Closed due to PR merge: https://github.com/:user/:repo/pull/${{ env.PR_NUMBER }}/'
+      - uses: panther-labs/github-asana-action@v3.0.4
+        if: github.event.pull_request.merged
+        with:
+          asana-pat: ${{ secrets.ASANA_PAT }}
+          trigger-phrase-regex: '\/asana'
+          action: 'complete-task'
+          is-complete: true

@@ -36,3 +36,23 @@ dt_git_ignore <- function(..., path = ".") {
 
   ignores
 }
+
+dt_use_standard_git_ignores <- function(path = ".") {
+  usethis::use_git_ignore(
+    c(
+      # R
+      ".RData",
+      ".Renviron",
+      ".Rhistory",
+      ".Rproj.user",
+      ".Ruserdata",
+      # LibreOffice
+      ".~lock.*#",
+      # Microsoft Office
+      "~$*.doc*",
+      "~$*.xls*",
+      "~$*.ppt*"
+    ),
+    directory = path
+  )
+}

@@ -1,12 +1,12 @@
 #' Create a Data Team Pipeline project
-#' 
+#'
 #' Sets up the necessary infrastructure to get a pipeline spun up
 #' real quick!
-#' 
-#' @param path Where the project should be created. Defaults to 
+#'
+#' @param path Where the project should be created. Defaults to
 #'   the current working directory.
 #' @param force If content already exists in `path`, removes it for
-#'   creation of project architecture. **Be careful!!** Use only 
+#'   creation of project architecture. **Be careful!!** Use only
 #'   when absolutely needed.
 #' @return The path of the project, invisibly
 #' @export
@@ -24,43 +24,62 @@ init <- function(path = ".", force = FALSE) {
 
   check_path_existing(path)
   usethis::create_project(path, rstudio = TRUE, open = FALSE)
-  
+
   dt_use_git(path)
 
   renv <- FALSE
+  asana_notif <- FALSE
   auth_osf <- FALSE
   auth_kobo <- FALSE
   unit_tests <- FALSE
 
-  usethis::with_project(path, {
-    usethis::use_git_ignore(".RData")
-    usethis::use_directory("R")
-    usethis::use_directory("config")
-    
-    use_templ(
-      "common",
-      "utils.R",
-      save_as = "R/utils.R"
-    )
+  usethis::with_project(
+    path = path,
+    code = {
+      dt_use_standard_git_ignores()
+      usethis::use_directory("R")
+      usethis::use_directory("config")
 
-    auth_osf <- dtprj_use_osf()
-    auth_kobo <- dtprj_use_kobo()
+      use_templ(
+        "common",
+        "utils.R",
+        save_as = "R/utils.R"
+      )
 
-    unit_tests <- dtprj_use_tests()
+      use_templ(
+        "common", "Renviron",
+        save_as = ".Renviron"
+      )
 
-    engine <- dtprj_use_engine(
-      unit_tests = unit_tests,
-      auth_kobo = auth_kobo
-    )
-    renv <- dtprj_use_renv()
+      use_templ(
+        "common", "environment.R",
+        save_as = "config/environment.R"
+      )
 
-  })
+      asana_notif <- dtprj_use_asana()
+      auth_osf <- dtprj_use_osf()
+      auth_kobo <- dtprj_use_kobo()
 
+      unit_tests <- dtprj_use_tests()
+
+      engine <- dtprj_use_engine(
+        unit_tests = unit_tests,
+        auth_kobo = auth_kobo
+      )
+      renv <- dtprj_use_renv()
+    },
+    quiet = TRUE
+  )
+
+  usethis::ui_done("Project created!")
   info_messages(
     unit_tests = unit_tests
   )
 
+  cat_line()
+  message("To Do:")
   todo_messages(
+    asana_notif = asana_notif,
     auth_osf = auth_osf,
     auth_kobo = auth_kobo,
     renv = renv
@@ -97,12 +116,13 @@ check_path_existing <- function(path) {
 
 post_messages <- function(type, ...) {
   known_messages <- list(
+    asana_notif = "Replace :user and :repo in 'asana-pr-open.yaml'",
     auth_osf = c(
-      "Set the 'OSF_PAT' environment variable in your .Renviron to your OSF token. ",
+      "Set the 'OSF_PAT' environment variable in your project's .Renviron to your OSF token. ",
       "See details here: https://docs.ropensci.org/osfr/articles/auth"
     ),
     auth_kobo = c(
-      "Set the 'KPI_TOKEN' environment variable in your .Renviron to your KPI token. ",
+      "Set the 'KPI_TOKEN' environment variable in your project's .Renviron to your KPI token. ",
       "See details here: https://support.kobotoolbox.org/api.html#getting-your-api-token"
     ),
     renv = "Run `renv::init()`",
@@ -131,24 +151,16 @@ post_messages <- function(type, ...) {
   }
 }
 
-info_messages <- function(
-  unit_tests = FALSE
-) {
+info_messages <- function(...) {
   post_messages(
     "info",
-    unit_tests = unit_tests
+    ...
   )
 }
 
-todo_messages <- function(
-  auth_osf = FALSE,
-  auth_kobo = FALSE,
-  renv = FALSE
-) {
+todo_messages <- function(...) {
   post_messages(
     "todo",
-    auth_osf = auth_osf,
-    auth_kobo = auth_kobo,
-    renv = renv
+    ...
   )
 }

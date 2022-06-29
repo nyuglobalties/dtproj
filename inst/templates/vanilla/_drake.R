@@ -9,6 +9,9 @@ for (f in src_files) {
 }
 
 # Edit 'config/packages.R' to attach packages needed for your pipeline
+# NB: If you use renv, add `package::function` references to enable
+#     renv to track "Suggested" packages, which are not always picked
+#     up with `renv::snapshot()`
 source(here::here("config/packages.R"))
 
 # Edit 'config/environment.R' to define globals from environment vars
